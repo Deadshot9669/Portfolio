@@ -448,9 +448,19 @@ function initContactForm() {
     if (spinner)   spinner.classList.remove('hidden');
     if (submitBtn) submitBtn.disabled = true;
 
-    fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) })
-      .then(function (r) { return r.json(); })
+    fetch('https://api.web3forms.com/submit', { 
+      method: 'POST', 
+      headers: {
+        'Accept': 'application/json'
+      },
+      body: new FormData(form) 
+    })
+      .then(function (r) { 
+        console.log("Risposta server:", r);
+        return r.json(); 
+      })
       .then(function (result) {
+        console.log("Dati Web3Forms:", result);
         if (result.success) {
           if (success) success.classList.remove('hidden');
           form.reset();

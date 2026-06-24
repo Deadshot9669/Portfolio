@@ -448,12 +448,16 @@ function initContactForm() {
     if (spinner)   spinner.classList.remove('hidden');
     if (submitBtn) submitBtn.disabled = true;
 
+    var formData = new FormData(form);
+    /* Previene il blocco "Pro feature" rimuovendo la retrocompatibilità di hCaptcha */
+    formData.delete('g-recaptcha-response');
+
     fetch('https://api.web3forms.com/submit', { 
       method: 'POST', 
       headers: {
         'Accept': 'application/json'
       },
-      body: new FormData(form) 
+      body: formData 
     })
       .then(function (r) { 
         console.log("Risposta server:", r);

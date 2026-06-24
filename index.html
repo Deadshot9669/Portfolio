@@ -16,16 +16,15 @@
   -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self';
+                 script-src 'self' https://js.hcaptcha.com;
                  style-src 'self' 'unsafe-inline';
                  img-src 'self' data:;
                  font-src 'self';
-                 connect-src 'self' https://api.web3forms.com;
+                 connect-src 'self' https://api.web3forms.com https://hcaptcha.com;
                  form-action https://api.web3forms.com;
-                 frame-src 'none';
+                 frame-src 'self' https://hcaptcha.com;
                  object-src 'none';
                  base-uri 'self';">
-
   <!-- SEO & Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230F172A%22/><text y=%2268%22 x=%2250%22 font-size=%2248%22 font-weight=%22700%22 font-family=%22sans-serif%22 fill=%22%232563EB%22 text-anchor=%22middle%22>AL</text></svg>">
   <title>Andrea Lombardo — IT, Homelab &amp; Scienze Agrarie</title>
@@ -48,6 +47,9 @@
 
   <!-- Self-hosted Inter font -->
   <link rel="preload" href="fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- hCaptcha — form spam protection (Web3Forms Free plan) -->
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 
   <style>
     /* ── Language dropdown ─────────────────────────────────────── */
@@ -1025,6 +1027,9 @@
                   <span style="color:#2563EB;" aria-hidden="true"> *</span>
                 </label>
               </div>
+
+              <!-- hCaptcha widget — token inviato automaticamente via FormData -->
+              <div class="h-captcha mb-5" data-sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2"></div>
 
               <button type="submit" id="form-submit-btn" class="btn-primary w-full sm:w-auto">
                 <span class="btn-text" data-it="Invia messaggio" data-en="Send message">Invia messaggio</span>

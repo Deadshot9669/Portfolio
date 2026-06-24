@@ -160,6 +160,17 @@
       width: 100vw !important;
       height: 100vh !important;
     }
+
+    /* --- BUGFIX: hCaptcha Mobile Overflow --- */
+    .h-captcha {
+      max-width: 100% !important;
+      overflow: hidden !important;
+    }
+    .h-captcha iframe {
+      max-width: 100% !important;
+      transform: scale(0.95);
+      transform-origin: left center;
+    }
   </style>
 </head>
 
@@ -367,7 +378,7 @@
       </div>
 
       <!-- Scroll indicator -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2
                   text-steel-500 animate-bounce" aria-hidden="true">
         <span class="text-xs font-mono tracking-widest uppercase">Scroll</span>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -877,7 +888,7 @@
     </section>
 
     <!-- CONTATTI -->
-    <section id="contatti" class="py-20 lg:py-28 relative"
+    <section id="contatti" class="py-20 lg:py-28 relative overflow-x-hidden w-full max-w-full"
              style="background: linear-gradient(180deg, #0A1224 0%, #060C17 100%);">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 reveal">
@@ -972,7 +983,7 @@
             <form id="contact-form"
                   action="https://api.web3forms.com/submit"
                   method="POST"
-                  class="glass-card p-6 sm:p-8 space-y-5"
+                  class="glass-card p-6 sm:p-8 space-y-5 w-full max-w-full"
                   novalidate>
 
               <input type="hidden" name="access_key" value="051b6e35-b023-4b55-9fcc-7ae4ac79c832">

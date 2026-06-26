@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it" dir="ltr">
+<html lang="it" dir="ltr" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
   -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self' https://hcaptcha.com https://*.hcaptcha.com;
+                 script-src 'self';
                  style-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com;
                  img-src 'self' data: https://hcaptcha.com https://*.hcaptcha.com;
                  font-src 'self';
@@ -25,6 +25,10 @@
                  frame-src 'self' https://hcaptcha.com https://*.hcaptcha.com;
                  object-src 'none';
                  base-uri 'self';">
+  <!-- Security Headers (GitHub Pages: served as HTTP headers via _headers; also as meta fallbacks) -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
   <!-- SEO & Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230F172A%22/><text y=%2268%22 x=%2250%22 font-size=%2248%22 font-weight=%22700%22 font-family=%22sans-serif%22 fill=%22%232563EB%22 text-anchor=%22middle%22>AL</text></svg>">
   <title>Andrea Lombardo — IT, Homelab &amp; Scienze Agrarie</title>
@@ -61,14 +65,16 @@
       background: transparent;
       border: 1px solid rgba(37,99,235,0.35);
       border-radius: 999px;
-      color: #A9B5CC;
+      color: #475569;                         /* slate-600 — leggibile in light */
       font-size: 0.72rem; font-family: ui-monospace, monospace;
       font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
       cursor: pointer; white-space: nowrap;
       transition: border-color 0.2s, color 0.2s;
       user-select: none;
     }
-    #lang-toggle:hover { border-color: #2563EB; color: #60a5fa; }
+    #lang-toggle:hover { border-color: #2563EB; color: #2563EB; }
+    .dark #lang-toggle { color: #A9B5CC; }
+    .dark #lang-toggle:hover { color: #60a5fa; }
     #lang-toggle .chevron {
       display: inline-block; font-style: normal;
       transition: transform 0.2s;
@@ -76,18 +82,25 @@
     }
     #lang-dropdown.open #lang-toggle .chevron { transform: rotate(180deg); }
 
+    /* Light mode lang menu */
     #lang-menu {
       position: absolute; right: 0; top: calc(100% + 6px);
-      background: rgba(15,23,42,0.97);
-      border: 1px solid rgba(37,99,235,0.7);
+      background: rgba(248, 250, 252, 0.98);  /* slate-50 */
+      border: 1px solid rgba(37,99,235,0.35);
       border-radius: 10px;
       min-width: 110px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      box-shadow: 0 8px 32px rgba(15,23,42,0.12);
       overflow: hidden;
       opacity: 0; transform: translateY(-6px) scale(0.97);
       pointer-events: none;
       transition: opacity 0.18s, transform 0.18s;
       z-index: 200;
+    }
+    /* Dark mode lang menu */
+    .dark #lang-menu {
+      background: rgba(15,23,42,0.97);
+      border-color: rgba(37,99,235,0.7);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
     }
     #lang-dropdown.open #lang-menu {
       opacity: 1; transform: translateY(0) scale(1);
@@ -97,21 +110,47 @@
       display: flex; align-items: center; gap: 8px;
       width: 100%; padding: 9px 14px;
       background: transparent; border: none;
-      color: #94a3b8;
+      color: #475569;                         /* slate-600 */
       font-size: 0.78rem; font-family: ui-monospace, monospace;
       font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
       cursor: pointer; text-align: left;
       transition: background 0.15s, color 0.15s;
     }
-    #lang-menu button:hover { background: rgba(37,99,235,0.12); color: #60a5fa; }
+    #lang-menu button:hover { background: rgba(37,99,235,0.08); color: #2563EB; }
     #lang-menu button.lang-active { color: #2563EB; background: rgba(37,99,235,0.08); }
-    #lang-menu button + button { border-top: 1px solid rgba(37,99,235,0.4); }
+    #lang-menu button + button { border-top: 1px solid rgba(148,163,184,0.3); }
+    .dark #lang-menu button { color: #94a3b8; }
+    .dark #lang-menu button:hover { background: rgba(37,99,235,0.12); color: #60a5fa; }
+    .dark #lang-menu button.lang-active { color: #2563EB; background: rgba(37,99,235,0.08); }
+    .dark #lang-menu button + button { border-top-color: rgba(37,99,235,0.4); }
 
-    /* ── Navbar scrolled ───────────────────────────────────────── */
+    /* ── Navbar base glass ─────────────────────────────────────── */
+    #main-nav {
+      transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+
+    /* ── Navbar scrolled — Dark (default) ─────────────────────── */
     #main-nav.scrolled {
-      background-color: rgba(6,12,23,0.92);
-      border-bottom-color: rgba(37,99,235,0.3);
-      box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+      background-color: rgba(6,12,23,0.88);
+      border-bottom-color: rgba(37,99,235,0.25);
+      box-shadow:
+        0 4px 32px rgba(0,0,0,0.45),
+        0 1px 0 rgba(37,99,235,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    /* ── Navbar — Light mode (class-based) ─────────────────────── */
+    html:not(.dark) #main-nav {
+      background-color: rgba(248, 250, 252, 0.15);
+      border-bottom-color: rgba(148, 163, 184, 0.4);
+    }
+    html:not(.dark) #main-nav.scrolled {
+      background-color: rgba(248, 250, 252, 0.96);
+      border-bottom-color: rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 4px 32px rgba(15,23,42,0.08),
+        0 1px 0 rgba(37,99,235,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.8);
     }
 
     /* ── Profile photo ─────────────────────────────────────────── */
@@ -122,12 +161,23 @@
       border-radius: 9999px;
       overflow: hidden;
       border: 1.5px solid rgba(37,99,235,0.3);
-      box-shadow: 0 0 80px rgba(37,99,235,0.25);
-      transition: box-shadow 0.5s ease, transform 0.4s ease;
+      box-shadow:
+        0 0 80px rgba(37,99,235,0.25),
+        0 0 0 1px rgba(37,99,235,0.15),
+        0 8px 32px rgba(0,0,0,0.3);
+      /* FIX #3: will-change + backface prevents blur artefacts on scale */
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      transition: box-shadow 0.5s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1);
     }
     .profile-photo-wrap:hover {
-      box-shadow: 0 0 110px rgba(37,99,235,0.4);
-      transform: scale(1.02);
+      box-shadow:
+        0 0 110px rgba(37,99,235,0.4),
+        0 0 0 2px rgba(37,99,235,0.4),
+        0 16px 48px rgba(0,0,0,0.4);
+      transform: translateZ(0) scale(1.025);
     }
     @media (max-width: 1023px) {
       .profile-photo-wrap { width: 220px; height: 220px; }
@@ -139,9 +189,14 @@
       width: 100%; height: 100%;
       object-fit: cover; object-position: center top;
       display: block;
-      transition: transform 0.6s ease;
+      /* FIX #3: translateZ prevents sub-pixel blur on GPU composite */
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      transition: transform 0.55s cubic-bezier(0.22,1,0.36,1);
     }
-    .profile-photo-wrap:hover img { transform: scale(1.06); }
+    .profile-photo-wrap:hover img { transform: translateZ(0) scale(1.055); }
     .profile-initials {
       display: flex; align-items: center; justify-content: center;
       width: 100%; height: 100%;
@@ -172,12 +227,14 @@
       transform-origin: left center;
     }
   </style>
+
+
 </head>
 
-<body class="overflow-x-hidden">
+<body class="overflow-x-hidden transition-colors duration-300 bg-slate-50 dark:bg-[#0A1224] text-slate-800 dark:text-steel-300">
 
   <!-- Network canvas background -->
-  <canvas id="network-canvas" aria-hidden="true"></canvas>
+  <canvas id="network-canvas" aria-hidden="true" style="position: fixed; top: 0; left: 0; z-index: 0;"></canvas>
 
   <!-- Skip link (Accessibility) -->
   <a href="#main-content"
@@ -193,17 +250,20 @@
        ============================================================ -->
   <nav id="main-nav"
        class="fixed top-0 left-0 right-0 z-50 transition-all duration-500
-              bg-navy-950/30 backdrop-blur-md border-b border-blue-800/30"
+              bg-white/30 dark:bg-navy-950/30 backdrop-blur-md
+              border-b border-slate-200/50 dark:border-blue-800/30"
        role="navigation" aria-label="Navigazione principale">
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center h-16 gap-4">
 
         <!-- ① Logo — left, fixed width -->
-        <a href="#hero" class="flex-shrink-0 font-bold text-lg tracking-tight text-steel-100
-                                hover:text-blue-400 transition-colors duration-300 font-mono"
+        <a href="#hero" class="flex-shrink-0 font-bold text-lg tracking-tight
+                                text-slate-800 dark:text-steel-100
+                                hover:text-blue-500 dark:hover:text-blue-400
+                                transition-colors duration-300 font-mono"
            aria-label="Home — Andrea Lombardo">
-          <span style="color:#2563EB;">&lt;</span>AL<span style="color:#2563EB;">/&gt;</span>
+          <span class="text-blue-600">&lt;</span>AL<span class="text-blue-600">/&gt;</span>
         </a>
 
         <!-- ② Nav links — desktop only, centered (flex-1) -->
@@ -220,8 +280,24 @@
              data-it="Contatti"   data-en="Contact">Contatti</a>
         </div>
 
-        <!-- ③ Right slot: language dropdown + mobile hamburger -->
+        <!-- ③ Right slot: theme toggle + language dropdown + mobile hamburger -->
         <div class="flex items-center gap-3 ml-auto">
+
+          <!-- Theme toggle button -->
+          <button id="theme-toggle" aria-label="Cambia tema" title="Cambia tema">
+            <!-- Sun icon (shown in dark mode → click to go light) -->
+            <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+            </svg>
+            <!-- Moon icon (shown in light mode → click to go dark) -->
+            <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+            </svg>
+          </button>
 
           <!-- Language dropdown (shared desktop+mobile) -->
           <div id="lang-dropdown" aria-label="Seleziona lingua">
@@ -242,7 +318,7 @@
 
           <!-- Hamburger — mobile only -->
           <button id="mobile-menu-btn"
-                  class="md:hidden text-steel-300 hover:text-blue-400 transition-colors p-2"
+                  class="md:hidden text-slate-500 dark:text-steel-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-2"
                   aria-label="Apri menu" aria-expanded="false" aria-controls="mobile-menu">
             <svg id="hamburger-icon" class="w-5 h-5" fill="none" stroke="currentColor"
                  viewBox="0 0 24 24" aria-hidden="true">
@@ -261,9 +337,9 @@
       <!-- Mobile nav menu -->
       <div id="mobile-menu"
            class="md:hidden max-h-0 overflow-hidden transition-all duration-300
-                  bg-navy-950/90 backdrop-blur-md"
+                  bg-white/95 dark:bg-navy-950/90 backdrop-blur-md"
            role="menu">
-        <div class="pb-4 pt-2 space-y-1 border-t border-blue-800/40">
+        <div class="pb-4 pt-2 space-y-1 border-t border-slate-200/60 dark:border-blue-800/40">
           <a href="#profilo"    class="nav-link block py-3 px-2" data-section="profilo"    role="menuitem"
              data-it="Profilo"    data-en="About">Profilo</a>
           <a href="#skills"     class="nav-link block py-3 px-2" data-section="skills"     role="menuitem"
@@ -283,11 +359,10 @@
        HERO SECTION
        ============================================================ -->
   <header id="hero"
-          class="relative min-h-screen flex items-center overflow-hidden"
-          style="background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,0.14) 0%, transparent 70%), linear-gradient(180deg, #060C17 0%, #0F172A 60%, #0D1830 100%);">
+          class="relative z-10 min-h-screen flex items-center overflow-hidden">
 
     <!-- Grid overlay -->
-    <div class="absolute inset-0 opacity-[0.04] pointer-events-none" aria-hidden="true"
+    <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.04] pointer-events-none" aria-hidden="true"
          style="background-image: linear-gradient(rgba(37,99,235,0.8) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(37,99,235,0.8) 1px, transparent 1px);
                 background-size: 60px 60px;">
@@ -312,26 +387,27 @@
 
           <!-- Eyebrow -->
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full
-                      text-xs font-mono tracking-widest uppercase mb-6 animate-fade-in"
-               style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.35); color: #60a5fa;">
+                      text-xs font-mono tracking-widest uppercase mb-6 animate-fade-in
+                      text-blue-600 dark:text-blue-400"
+               style="background: rgba(37,99,235,0.10); border: 1px solid rgba(37,99,235,0.30);">
             <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#2563EB;"></span>
             Portfolio — 2026
           </div>
 
           <!-- Name -->
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4 leading-none text-balance animate-slide-up">
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4 leading-none text-balance animate-slide-up text-slate-900 dark:text-white">
             Andrea<br>
             <span class="gradient-text">Lombardo</span>
           </h1>
 
           <!-- Typewriter -->
-          <p class="text-xl sm:text-2xl text-steel-300 font-light mb-6 min-h-[2rem] animate-slide-up w-full break-words"
+          <p class="text-xl sm:text-2xl text-slate-600 dark:text-steel-300 font-light mb-6 min-h-[2rem] animate-slide-up w-full break-words"
              style="animation-delay:0.15s">
             <span id="typewriter" style="border-right: 2px solid #2563EB; padding-right: 4px;"></span>
           </p>
 
           <!-- Bio -->
-          <p class="text-steel-400 max-w-xl leading-relaxed mb-10 animate-slide-up mx-auto lg:mx-0"
+          <p class="text-slate-500 dark:text-steel-400 max-w-xl leading-relaxed mb-10 animate-slide-up mx-auto lg:mx-0"
              style="animation-delay:0.3s"
              data-it="Studente in Scienze e Tecnologie Agrarie con spiccate competenze IT. Unisco l'approccio analitico degli studi scientifici a un'esperienza pratica nella configurazione di infrastrutture self-hosted, networking e problem-solving hardware/software."
              data-en="Agricultural Sciences student with strong IT skills. I combine the analytical approach of scientific studies with hands-on experience in self-hosted infrastructure, networking, and hardware/software problem-solving.">
@@ -358,18 +434,18 @@
                style="animation-delay:0.6s">
             <div class="text-center">
               <p class="text-2xl font-bold gradient-text">9+</p>
-              <p class="text-xs text-steel-500 font-mono uppercase tracking-wider"
+              <p class="text-xs text-slate-400 dark:text-steel-500 font-mono uppercase tracking-wider"
                  data-it="Aree di competenza" data-en="Skill areas">Aree di competenza</p>
             </div>
-            <div class="w-px bg-steel-700/60 self-stretch hidden sm:block"></div>
+            <div class="w-px bg-slate-300 dark:bg-steel-700/60 self-stretch hidden sm:block"></div>
             <div class="text-center">
               <p class="text-2xl font-bold gradient-text">ICDL</p>
-              <p class="text-xs text-steel-500 font-mono uppercase tracking-wider">Full Standard</p>
+              <p class="text-xs text-slate-400 dark:text-steel-500 font-mono uppercase tracking-wider">Full Standard</p>
             </div>
-            <div class="w-px bg-steel-700/60 self-stretch hidden sm:block"></div>
+            <div class="w-px bg-slate-300 dark:bg-steel-700/60 self-stretch hidden sm:block"></div>
             <div class="text-center">
               <p class="text-2xl font-bold gradient-text">L-25</p>
-              <p class="text-xs text-steel-500 font-mono uppercase tracking-wider"
+              <p class="text-xs text-slate-400 dark:text-steel-500 font-mono uppercase tracking-wider"
                  data-it="Laurea Triennale" data-en="Bachelor's Degree">Laurea Triennale</p>
             </div>
           </div>
@@ -377,9 +453,10 @@
 
       </div>
 
-      <!-- Scroll indicator -->
-      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2
-                  text-steel-500 animate-bounce" aria-hidden="true">
+      <!-- Scroll indicator — FIX #2: Centered on all devices with margin auto trick -->
+      <div style="position:absolute; bottom:2rem; left:0; right:0; width:fit-content; margin:0 auto;"
+           class="flex flex-col items-center gap-2 text-steel-500 animate-bounce"
+           aria-hidden="true">
         <span class="text-xs font-mono tracking-widest uppercase">Scroll</span>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
@@ -391,11 +468,11 @@
   <!-- ============================================================
        MAIN CONTENT
        ============================================================ -->
-  <main id="main-content">
+  <main id="main-content" class="relative z-10">
 
     <!-- PROFILO -->
-    <section id="profilo" class="py-20 lg:py-28 relative"
-             style="background: linear-gradient(180deg, #0D1830 0%, #0F172A 100%);">
+    <section id="profilo"
+             class="py-20 lg:py-28 relative">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 reveal">
           <p class="section-subtitle" data-it="Chi sono" data-en="About me">Chi sono</p>
@@ -404,14 +481,14 @@
         </div>
 
         <div class="max-w-3xl mx-auto mb-16 reveal" data-delay="100">
-          <p class="text-steel-300 text-lg leading-relaxed text-center"
+          <p class="text-slate-600 dark:text-steel-300 text-lg leading-relaxed text-center"
              data-it="Sono uno studente di <strong class='text-steel-100'>Scienze e Tecnologie Agrarie (L-25)</strong> all'Università degli Studi di Torino. Parallelamente agli studi, coltivo da anni una passione concreta per il mondo IT: non a livello teorico, ma pratico e quotidiano."
              data-en="I am a student of <strong class='text-steel-100'>Agricultural and Environmental Sciences (L-25)</strong> at the University of Turin. Alongside my studies, I have been nurturing a concrete passion for IT for years — not at a theoretical level, but practical and hands-on.">
-            Sono uno studente di <strong class="text-steel-100">Scienze e Tecnologie Agrarie (L-25)</strong>
+            Sono uno studente di <strong class="text-slate-900 dark:text-steel-100">Scienze e Tecnologie Agrarie (L-25)</strong>
             all'Università degli Studi di Torino. Parallelamente agli studi, coltivo da anni una
             passione concreta per il mondo IT: non a livello teorico, ma pratico e quotidiano.
           </p>
-          <p class="text-steel-400 leading-relaxed text-center mt-4"
+          <p class="text-slate-500 dark:text-steel-400 leading-relaxed text-center mt-4"
              data-it="Gestisco un <strong class='text-teal-400'>homelab</strong> personale con server virtuali Proxmox, container Docker, rete configurata con Tailscale e servizi esposti via Cloudflare. Assemblo PC, riparo hardware e automatizz&#x43e; l'abitazione con Home Assistant. Non è lavoro: è il modo in cui mi piace imparare e risolvere problemi."
              data-en="I run a personal <strong class='text-teal-400'>homelab</strong> with Proxmox virtual servers, Docker containers, a Tailscale-secured network and Cloudflare-exposed services. I build and repair PCs, and automate my home with Home Assistant. It's not a job — it's how I enjoy learning and solving real problems.">
             Gestisco un <strong class="text-teal-400">homelab</strong> personale con server virtuali Proxmox,
@@ -421,86 +498,99 @@
           </p>
         </div>
 
-        <!-- Profile cards -->
-        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 reveal" data-delay="200">
+        <!-- UPGRADE #7: Bento Grid Profile Cards — asymmetric layout -->
+        <div class="bento-grid reveal" data-delay="200">
 
-          <div class="glass-card p-8 text-center hover:-translate-y-1
-                      transition-all duration-500 group cursor-default"
-               style="--hover-border: rgba(37,99,235,0.4);">
-            <div class="w-14 h-14 mx-auto mb-5 rounded-xl flex items-center justify-center
-                        transition-colors duration-300"
-                 style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #60a5fa;">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-              </svg>
+          <!-- Card 1: Approccio Scientifico — large, col-span 4 + 2 rows -->
+          <div class="bento-col-4 bento-row-2 glass-card p-8 hover-glow cursor-default group"
+               style="min-height:220px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div class="w-14 h-14 mb-5 rounded-2xl flex items-center justify-center
+                          transition-all duration-350 group-hover:scale-110"
+                   style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #60a5fa;">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-steel-100 text-xl mb-3"
+                  data-it="Approccio Scientifico" data-en="Scientific Approach">Approccio Scientifico</h3>
+              <p class="text-slate-600 dark:text-steel-400 text-sm leading-relaxed"
+                 data-it="Studi universitari in agraria che affinano il metodo analitico, la ricerca dati e la risoluzione sistemica dei problemi."
+                 data-en="University studies in agronomy that sharpen analytical thinking, data research and systematic problem-solving.">
+                Studi universitari in agraria che affinano il metodo analitico, la ricerca dati e la risoluzione sistemica dei problemi.
+              </p>
             </div>
-            <h3 class="font-bold text-steel-100 text-lg mb-2"
-                data-it="Approccio Scientifico" data-en="Scientific Approach">Approccio Scientifico</h3>
-            <p class="text-steel-400 text-sm leading-relaxed"
-               data-it="Studi universitari in agraria che affinano il metodo analitico, la ricerca dati e la risoluzione sistemica dei problemi."
-               data-en="University studies in agronomy that sharpen analytical thinking, data research and systematic problem-solving.">
-              Studi universitari in agraria che affinano il metodo analitico, la ricerca dati e la risoluzione sistemica dei problemi.
-            </p>
+            <div class="mt-4">
+              <span class="tag-pill" data-it="Analisi Dati" data-en="Data Analysis">Analisi Dati</span>
+              <span class="tag-pill ml-1" data-it="Metodo Scientifico" data-en="Scientific Method">Metodo Scientifico</span>
+            </div>
           </div>
 
-          <div class="glass-card p-8 text-center hover:-translate-y-1
-                      transition-all duration-500 group cursor-default">
-            <div class="w-14 h-14 mx-auto mb-5 rounded-xl flex items-center justify-center
-                        transition-colors duration-300"
-                 style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #60a5fa;">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
-              </svg>
+          <!-- Card 2: Homelab — col-span 2 -->
+          <div class="bento-col-2 glass-card p-6 hover-glow cursor-default group"
+               style="min-height:190px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div class="w-12 h-12 mb-4 rounded-xl flex items-center justify-center
+                          transition-all duration-350 group-hover:scale-110"
+                   style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #60a5fa;">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                </svg>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
+                  data-it="Homelab &amp; Infrastrutture" data-en="Homelab &amp; Infrastructure">Homelab &amp; Infrastrutture</h3>
+              <p class="text-slate-600 dark:text-steel-400 text-sm leading-relaxed"
+                 data-it="Server self-hosted, reti locali, container e virtualizzazione."
+                 data-en="Self-hosted servers, local networks, containers and virtualisation.">
+                Server self-hosted, reti locali, container e virtualizzazione.
+              </p>
             </div>
-            <h3 class="font-bold text-steel-100 text-lg mb-2"
-                data-it="Homelab &amp; Infrastrutture" data-en="Homelab &amp; Infrastructure">Homelab &amp; Infrastrutture</h3>
-            <p class="text-steel-400 text-sm leading-relaxed"
-               data-it="Server self-hosted, reti locali, container e virtualizzazione gestiti per passione: un hands-on lab permanente."
-               data-en="Self-hosted servers, local networks, containers and virtualisation managed for passion: a permanent hands-on lab.">
-              Server self-hosted, reti locali, container e virtualizzazione gestiti per passione: un hands-on lab permanente.
-            </p>
           </div>
 
-          <div class="glass-card p-8 text-center hover:-translate-y-1
-                      transition-all duration-500 group cursor-default sm:col-span-2 md:col-span-1">
-            <div class="w-14 h-14 mx-auto mb-5 rounded-xl flex items-center justify-center
-                        transition-colors duration-300"
-                 style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #60a5fa;">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
-              </svg>
+          <!-- Card 3: Problem Solver — col-span 2 -->
+          <div class="bento-col-2 glass-card p-6 hover-glow cursor-default group"
+               style="min-height:190px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div class="w-12 h-12 mb-4 rounded-xl flex items-center justify-center
+                          transition-all duration-350 group-hover:scale-110"
+                   style="background: rgba(47,205,181,0.12); border: 1px solid rgba(47,205,181,0.3); color: #2FCDB5;">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                </svg>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
+                  data-it="Problem Solver" data-en="Problem Solver">Problem Solver</h3>
+              <p class="text-slate-600 dark:text-steel-400 text-sm leading-relaxed"
+                 data-it="Soluzioni concrete ad ogni livello dello stack tecnologico."
+                 data-en="Concrete solutions at every layer of the technology stack.">
+                Soluzioni concrete ad ogni livello dello stack tecnologico.
+              </p>
             </div>
-            <h3 class="font-bold text-steel-100 text-lg mb-2"
-                data-it="Problem Solver" data-en="Problem Solver">Problem Solver</h3>
-            <p class="text-steel-400 text-sm leading-relaxed"
-               data-it="Dalla diagnostica hardware alla configurazione di rete: trovo soluzioni concrete ad ogni livello dello stack tecnologico."
-               data-en="From hardware diagnostics to network configuration: I find concrete solutions at every layer of the technology stack.">
-              Dalla diagnostica hardware alla configurazione di rete: trovo soluzioni concrete ad ogni livello dello stack tecnologico.
-            </p>
           </div>
+
         </div>
       </div>
     </section>
 
     <!-- HARD SKILLS -->
-    <section id="skills" class="py-20 lg:py-28 relative"
-             style="background: linear-gradient(180deg, #0F172A 0%, #0A1224 100%);">
+    <section id="skills"
+             class="py-20 lg:py-28 relative">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 reveal">
           <p class="section-subtitle" data-it="Competenze" data-en="Competencies">Competenze</p>
           <h2 class="section-title" data-it="Hard Skills" data-en="Hard Skills">Hard Skills</h2>
           <div class="section-divider mx-auto"></div>
-          <p class="text-steel-400 max-w-xl mx-auto text-sm mt-4"
+          <p class="text-slate-500 dark:text-steel-400 max-w-xl mx-auto text-sm mt-4"
              data-it="Competenze pratiche acquisite per passione e autodidattica — non lavori formali, ma un ecosistema di conoscenze reali e approfondite."
              data-en="Practical skills developed through passion and self-teaching — not formal employment, but a deep and genuine knowledge ecosystem.">
             Competenze pratiche acquisite per passione e autodidattica — non lavori formali, ma un ecosistema di conoscenze reali e approfondite.
           </p>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" style="perspective:1000px;">
+        <div id="skills-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" style="perspective:1200px;">
 
           <!-- Skill 1 -->
           <div class="skill-card reveal" data-delay="0">
@@ -510,9 +600,9 @@
                       d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Infrastrutture Server &amp; Container" data-en="Server &amp; Container Infrastructure">Infrastrutture Server &amp; Container</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Virtualizzazione con Proxmox VE, gestione container con Docker e LXC, deployment di servizi self-hosted in ambienti isolati e sicuri."
                data-en="Virtualisation with Proxmox VE, container management with Docker and LXC, deployment of self-hosted services in isolated and secure environments.">
               Virtualizzazione con Proxmox VE, gestione container con Docker e LXC, deployment di servizi self-hosted in ambienti isolati e sicuri.
@@ -532,9 +622,9 @@
                       d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Automazione Domotica Avanzata" data-en="Advanced Home Automation">Automazione Domotica Avanzata</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Configurazione avanzata di Home Assistant con automazioni YAML, integrazione dispositivi Zigbee e protocollo MQTT per IoT domestico."
                data-en="Advanced Home Assistant configuration with YAML automations, Zigbee device integration and MQTT protocol for domestic IoT.">
               Configurazione avanzata di Home Assistant con automazioni YAML, integrazione dispositivi Zigbee e protocollo MQTT per IoT domestico.
@@ -554,9 +644,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Sviluppo Assistito da LLM" data-en="LLM-Assisted Development">Sviluppo Assistito da LLM</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Utilizzo avanzato di modelli linguistici (Claude, AI Studio) per automazione, scripting, sviluppo applicazioni e risoluzione di problemi complessi."
                data-en="Advanced use of large language models (Claude, AI Studio) for automation, scripting, application development and complex problem-solving.">
               Utilizzo avanzato di modelli linguistici (Claude, AI Studio) per automazione, scripting, sviluppo applicazioni e risoluzione di problemi complessi.
@@ -576,9 +666,9 @@
                       d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Sviluppo Android" data-en="Android Development">Sviluppo Android</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Sviluppo di applicazioni Android native con Android Studio, integrazione API e test su dispositivi fisici."
                data-en="Native Android application development with Android Studio, API integration and testing on physical devices.">
               Sviluppo di applicazioni Android native con Android Studio, integrazione API e test su dispositivi fisici.
@@ -597,9 +687,9 @@
                       d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Networking &amp; Self-Hosting" data-en="Networking &amp; Self-Hosting">Networking &amp; Self-Hosting</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Configurazione reti locali, tunneling sicuro con Tailscale, reverse proxy con Nginx Proxy Manager, DNS e CDN con Cloudflare."
                data-en="Local network configuration, secure tunnelling with Tailscale, reverse proxy with Nginx Proxy Manager, DNS and CDN management with Cloudflare.">
               Configurazione reti locali, tunneling sicuro con Tailscale, reverse proxy con Nginx Proxy Manager, DNS e CDN con Cloudflare.
@@ -619,9 +709,9 @@
                       d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Modellazione 3D" data-en="3D Modelling">Modellazione 3D</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Progettazione CAD parametrica con SolidWorks e Autodesk Fusion per prototipi, componenti meccanici e stampa 3D."
                data-en="Parametric CAD design with SolidWorks and Autodesk Fusion for prototypes, mechanical parts and 3D printing.">
               Progettazione CAD parametrica con SolidWorks e Autodesk Fusion per prototipi, componenti meccanici e stampa 3D.
@@ -640,9 +730,9 @@
                       d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.362a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Editing Foto &amp; Video" data-en="Photo &amp; Video Editing">Editing Foto &amp; Video</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Post-produzione video con DaVinci Resolve, grafica e design con Canva per contenuti digitali professionali."
                data-en="Video post-production with DaVinci Resolve, graphic design with Canva for professional digital content.">
               Post-produzione video con DaVinci Resolve, grafica e design con Canva per contenuti digitali professionali.
@@ -662,9 +752,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Hardware &amp; Certificazione ICDL" data-en="Hardware &amp; ICDL Certification">Hardware &amp; Certificazione ICDL</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Diagnostica e manutenzione meccanica su PC e moto. Certificazione ICDL Full Standard (lifetime) in ambito informatico."
                data-en="Hardware diagnostics and mechanical maintenance on PCs and motorcycles. Lifetime ICDL Full Standard IT certification.">
               Diagnostica e manutenzione meccanica su PC e moto. Certificazione ICDL Full Standard (lifetime) in ambito informatico.
@@ -683,9 +773,9 @@
                       d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
             </div>
-            <h3 class="font-bold text-steel-100 text-base mb-2"
+            <h3 class="font-bold text-slate-900 dark:text-steel-100 text-base mb-2"
                 data-it="Sviluppo Web" data-en="Web Development">Sviluppo Web</h3>
-            <p class="text-steel-400 text-sm leading-relaxed mb-4"
+            <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed mb-4"
                data-it="Realizzazione di siti web statici e dinamici (HTML, CSS, JavaScript, Tailwind). Portfolio e siti personali ospitati su infrastruttura self-managed."
                data-en="Development of static and dynamic websites (HTML, CSS, JavaScript, Tailwind). Portfolio and personal sites hosted on self-managed infrastructure.">
               Realizzazione di siti web statici e dinamici (HTML, CSS, JavaScript, Tailwind). Portfolio e siti personali ospitati su infrastruttura self-managed.
@@ -702,8 +792,8 @@
     </section>
 
     <!-- ESPERIENZE -->
-    <section id="esperienze" class="py-20 lg:py-28 relative"
-             style="background: linear-gradient(180deg, #0A1224 0%, #111D3A 100%);">
+    <section id="esperienze"
+             class="py-20 lg:py-28 relative">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 reveal">
           <p class="section-subtitle" data-it="Percorso" data-en="Journey">Percorso</p>
@@ -715,18 +805,18 @@
 
           <!-- Lavoro formale -->
           <div class="mb-6 reveal" data-delay="0">
-            <p class="text-xs font-mono uppercase tracking-widest mb-4 flex items-center gap-2" style="color: rgba(37,99,235,0.7);">
-              <span class="w-4 h-px" style="background:rgba(37,99,235,0.4);"></span>
+            <p class="text-xs font-mono uppercase tracking-widest mb-4 flex items-center gap-2 text-blue-600/70 dark:text-blue-400/70">
+              <span class="w-4 h-px bg-blue-500/40"></span>
               <span data-it="Esperienze lavorative" data-en="Work experience">Esperienze lavorative</span>
             </p>
           </div>
 
           <div class="timeline-item reveal-left" data-delay="100">
             <div class="mb-2"><span class="badge-past">Giu 2023 — Giu 2024</span></div>
-            <h3 class="text-xl font-bold text-steel-100 mb-1"
+            <h3 class="text-xl font-bold text-slate-900 dark:text-steel-100 mb-1"
                 data-it="Addetto alle vendite" data-en="Sales Associate">Addetto alle vendite</h3>
-            <p class="text-steel-500 text-sm mb-3 font-mono">Coop Italia · Beinasco (TO)</p>
-            <p class="text-steel-400 leading-relaxed text-sm"
+            <p class="text-slate-500 dark:text-steel-500 text-sm mb-3 font-mono">Coop Italia · Beinasco (TO)</p>
+            <p class="text-slate-700 dark:text-steel-400 leading-relaxed text-sm"
                data-it="Gestione della cassa, allestimento scaffali e assistenza clienti in reparto. Esperienza che ha consolidato organizzazione, puntualità, lavoro in team e gestione dello stress in contesti ad alto volume."
                data-en="Cash register management, shelf stocking and in-store customer assistance. An experience that reinforced organisational skills, punctuality, teamwork and stress management in high-volume environments.">
               Gestione della cassa, allestimento scaffali e assistenza clienti in reparto.
@@ -736,11 +826,11 @@
 
           <!-- Competenze pratiche -->
           <div class="mt-12 mb-6 reveal" data-delay="200">
-            <p class="text-xs font-mono uppercase tracking-widest mb-4 flex items-center gap-2" style="color: rgba(37,99,235,0.7);">
-              <span class="w-4 h-px" style="background:rgba(37,99,235,0.4);"></span>
+            <p class="text-xs font-mono uppercase tracking-widest mb-4 flex items-center gap-2 text-blue-600/70 dark:text-blue-400/70">
+              <span class="w-4 h-px bg-blue-500/40"></span>
               <span data-it="Competenze pratiche — passione &amp; homelab" data-en="Practical skills — passion &amp; homelab">Competenze pratiche — passione &amp; homelab</span>
             </p>
-            <p class="text-steel-500 text-sm max-w-lg"
+            <p class="text-slate-700 dark:text-steel-400 text-sm max-w-lg"
                data-it="Non lavori formali o attività freelance, ma un ecosistema di competenze reali acquisite sul campo, per curiosità e passione personale."
                data-en="Not formal employment or freelance work, but a genuine skills ecosystem built in the field, driven by curiosity and personal passion.">
               Non lavori formali o attività freelance, ma un ecosistema di competenze reali acquisite sul campo, per curiosità e passione personale.
@@ -754,11 +844,11 @@
                 <span data-it="In corso" data-en="Ongoing">In corso</span>
               </span>
             </div>
-            <h3 class="text-xl font-bold text-steel-100 mb-1"
+            <h3 class="text-xl font-bold text-slate-900 dark:text-steel-100 mb-1"
                 data-it="Homelab &amp; Infrastruttura Self-Hosted" data-en="Homelab &amp; Self-Hosted Infrastructure">Homelab &amp; Infrastruttura Self-Hosted</h3>
-            <p class="text-steel-500 text-sm mb-3 font-mono"
+            <p class="text-slate-500 dark:text-steel-500 text-sm mb-3 font-mono"
                data-it="Passione personale · Avanzata" data-en="Personal passion · Advanced">Passione personale · Avanzata</p>
-            <p class="text-steel-400 leading-relaxed text-sm"
+            <p class="text-slate-700 dark:text-steel-400 leading-relaxed text-sm"
                data-it="Gestione di un homelab con server fisici e virtuali (Proxmox), rete interna configurata, container Docker per decine di servizi (media server, dashboard, monitoring, VPN), esposizione sicura tramite Cloudflare e Nginx Proxy Manager. Tutto documentato, testato e mantenuto autonomamente."
                data-en="Management of a homelab with physical and virtual servers (Proxmox), a fully configured internal network, Docker containers for dozens of services (media server, dashboards, monitoring, VPN), securely exposed via Cloudflare and Nginx Proxy Manager. Everything documented, tested and maintained independently.">
               Gestione di un homelab con server fisici e virtuali (Proxmox), rete interna configurata,
@@ -774,11 +864,11 @@
                 <span data-it="In corso" data-en="Ongoing">In corso</span>
               </span>
             </div>
-            <h3 class="text-xl font-bold text-steel-100 mb-1"
+            <h3 class="text-xl font-bold text-slate-900 dark:text-steel-100 mb-1"
                 data-it="Automazione Domotica — Home Assistant" data-en="Home Automation — Home Assistant">Automazione Domotica — Home Assistant</h3>
-            <p class="text-steel-500 text-sm mb-3 font-mono"
+            <p class="text-slate-500 dark:text-steel-500 text-sm mb-3 font-mono"
                data-it="Passione personale · Avanzata" data-en="Personal passion · Advanced">Passione personale · Avanzata</p>
-            <p class="text-steel-400 leading-relaxed text-sm"
+            <p class="text-slate-700 dark:text-steel-400 leading-relaxed text-sm"
                data-it="Sistema domotico completo in produzione domestica: dispositivi Zigbee integrati, MQTT broker, automazioni YAML complesse, dashboard personalizzate. Integrazione con dispositivi smart di vari ecosistemi."
                data-en="Full home automation system in production: integrated Zigbee devices, MQTT broker, complex YAML automations and custom dashboards. Integration with smart devices from multiple ecosystems.">
               Sistema domotico completo in produzione domestica: dispositivi Zigbee integrati, MQTT broker, automazioni YAML complesse,
@@ -793,11 +883,11 @@
                 <span data-it="In corso" data-en="Ongoing">In corso</span>
               </span>
             </div>
-            <h3 class="text-xl font-bold text-steel-100 mb-1"
+            <h3 class="text-xl font-bold text-slate-900 dark:text-steel-100 mb-1"
                 data-it="Assemblaggio PC &amp; Diagnostica Hardware" data-en="PC Building &amp; Hardware Diagnostics">Assemblaggio PC &amp; Diagnostica Hardware</h3>
-            <p class="text-steel-500 text-sm mb-3 font-mono"
+            <p class="text-slate-500 dark:text-steel-500 text-sm mb-3 font-mono"
                data-it="Passione personale · Hardware" data-en="Personal passion · Hardware">Passione personale · Hardware</p>
-            <p class="text-steel-400 leading-relaxed text-sm"
+            <p class="text-slate-700 dark:text-steel-400 leading-relaxed text-sm"
                data-it="Assemblaggio e upgrade di PC desktop (gaming e server), diagnostica e risoluzione guasti hardware/software. Esperienza su sistemi Windows, Linux e ambienti misti. Manutenzione meccanica su moto (officina personale)."
                data-en="Desktop PC building and upgrades (gaming and server), hardware/software fault diagnosis and resolution. Experience with Windows, Linux and mixed environments. Mechanical maintenance on motorcycles (personal workshop).">
               Assemblaggio e upgrade di PC desktop (gaming e server), diagnostica e risoluzione guasti
@@ -811,8 +901,8 @@
     </section>
 
     <!-- ISTRUZIONE -->
-    <section id="istruzione" class="py-20 lg:py-28 relative"
-             style="background: linear-gradient(180deg, #111D3A 0%, #0A1224 100%);">
+    <section id="istruzione"
+             class="py-20 lg:py-28 relative">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 reveal">
           <p class="section-subtitle" data-it="Formazione" data-en="Education">Formazione</p>
@@ -841,10 +931,10 @@
                   </span>
                   <span class="tag-pill">L-25</span>
                 </div>
-                <h3 class="text-xl font-bold text-steel-100 mb-1"
+                <h3 class="text-xl font-bold text-slate-900 dark:text-steel-100 mb-1"
                     data-it="Scienze e Tecnologie Agrarie" data-en="Agricultural and Environmental Sciences">Scienze e Tecnologie Agrarie</h3>
-                <p class="text-steel-500 text-sm mb-3 font-mono">Università degli Studi di Torino (UniTO)</p>
-                <p class="text-steel-400 text-sm leading-relaxed"
+                <p class="text-slate-500 dark:text-steel-500 text-sm mb-3 font-mono">Università degli Studi di Torino (UniTO)</p>
+                <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed"
                    data-it="Laurea triennale (classe L-25) con focus su sistemi agro-ambientali, biologia applicata e tecnologie di produzione. Percorso che sviluppa capacità analitiche, rigore scientifico e visione interdisciplinare — competenze che si integrano naturalmente con l'approccio tecnologico."
                    data-en="Bachelor's degree (class L-25) focused on agro-environmental systems, applied biology and production technologies. A programme that builds analytical skills, scientific rigour and interdisciplinary vision — naturally complementary to a technical mindset.">
                   Laurea triennale (classe L-25) con focus su sistemi agro-ambientali, biologia applicata e tecnologie di produzione.
@@ -858,8 +948,8 @@
           <!-- Liceo -->
           <div class="glass-card p-6 sm:p-8 reveal" data-delay="150">
             <div class="flex flex-col sm:flex-row items-start gap-5">
-              <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-steel-700/60 border border-steel-600/40
-                          text-steel-400 flex items-center justify-center">
+              <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-200 dark:bg-steel-700/60 border border-slate-300 dark:border-steel-600/40
+                          text-slate-500 dark:text-steel-400 flex items-center justify-center">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -870,10 +960,10 @@
                   <span class="badge-past"
                         data-it="Set 2015 — Lug 2020" data-en="Sep 2015 — Jul 2020">Set 2015 — Lug 2020</span>
                 </div>
-                <h3 class="text-xl font-bold text-steel-100 mb-1"
+                <h3 class="text-xl font-bold text-slate-900 dark:text-steel-100 mb-1"
                     data-it='Liceo Scientifico "Maria Curie"' data-en='"Maria Curie" Science High School'>Liceo Scientifico "Maria Curie"</h3>
-                <p class="text-steel-500 text-sm mb-3 font-mono">Pinerolo (TO)</p>
-                <p class="text-steel-400 text-sm leading-relaxed"
+                <p class="text-slate-500 dark:text-steel-500 text-sm mb-3 font-mono">Pinerolo (TO)</p>
+                <p class="text-slate-700 dark:text-steel-400 text-sm leading-relaxed"
                    data-it="Formazione scientifica con solide basi in matematica, fisica, chimica e scienze naturali. Sviluppo del pensiero critico, metodo di studio e capacità di problem-solving analitico."
                    data-en="Science-focused education with strong foundations in mathematics, physics, chemistry and natural sciences. Development of critical thinking, study method and analytical problem-solving skills.">
                   Formazione scientifica con solide basi in matematica, fisica, chimica e scienze naturali.
@@ -888,14 +978,14 @@
     </section>
 
     <!-- CONTATTI -->
-    <section id="contatti" class="py-20 lg:py-28 relative overflow-x-hidden w-full max-w-full"
-             style="background: linear-gradient(180deg, #0A1224 0%, #060C17 100%);">
+    <section id="contatti"
+             class="py-20 lg:py-28 relative overflow-x-hidden w-full max-w-full">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 reveal">
           <p class="section-subtitle" data-it="Parliamo" data-en="Let's talk">Parliamo</p>
           <h2 class="section-title" data-it="Contatti" data-en="Contact">Contatti</h2>
           <div class="section-divider mx-auto"></div>
-          <p class="text-steel-400 max-w-md mx-auto text-sm"
+          <p class="text-slate-500 dark:text-steel-400 max-w-md mx-auto text-sm"
              data-it="Hai domande, proposte o vuoi semplicemente connetterti? Scrivimi."
              data-en="Have a question, a proposal, or simply want to connect? Drop me a message.">
             Hai domande, proposte o vuoi semplicemente connetterti? Scrivimi.
@@ -920,15 +1010,16 @@
                 </svg>
               </div>
               <div>
-                <p class="text-xs text-steel-500 font-mono uppercase tracking-wider mb-0.5">Email</p>
-                <p class="text-steel-200 font-medium transition-colors duration-300"
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase tracking-wider mb-0.5">Email</p>
+                <p class="text-slate-800 dark:text-white font-medium transition-colors duration-300"
                    style="--hover-color: #60a5fa;">lomband02@gmail.com</p>
               </div>
             </a>
 
             <div class="glass-card flex items-center gap-4 p-5">
-              <div class="w-11 h-11 rounded-xl bg-steel-700/60 border border-steel-600/40
-                          text-steel-400 flex items-center justify-center flex-shrink-0">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0
+                          transition-colors duration-300"
+                   style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #60a5fa;">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -936,9 +1027,9 @@
                 </svg>
               </div>
               <div>
-                <p class="text-xs text-steel-500 font-mono uppercase tracking-wider mb-0.5"
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase tracking-wider mb-0.5"
                    data-it="Posizione" data-en="Location">Posizione</p>
-                <p class="text-steel-200 font-medium">Airasca (TO), Italia</p>
+                <p class="text-slate-800 dark:text-white font-medium">Airasca (TO), Italia</p>
               </div>
             </div>
 
@@ -954,15 +1045,15 @@
                 </svg>
               </div>
               <div>
-                <p class="text-xs text-steel-500 font-mono uppercase tracking-wider mb-0.5">LinkedIn</p>
-                <p class="text-steel-200 font-medium transition-colors duration-300"
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase tracking-wider mb-0.5">LinkedIn</p>
+                <p class="text-slate-800 dark:text-white font-medium transition-colors duration-300"
                    data-it="Connettiti su LinkedIn" data-en="Connect on LinkedIn">Connettiti su LinkedIn</p>
               </div>
             </a>
 
             <!-- QR Code LinkedIn -->
             <div class="glass-card p-5 text-center">
-              <p class="text-xs text-steel-500 font-mono uppercase tracking-wider mb-4"
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase tracking-wider mb-4"
                  data-it="Scansiona per LinkedIn" data-en="Scan for LinkedIn">Scansiona per LinkedIn</p>
               <a href="https://www.linkedin.com/in/andrea-lombardo-748461345"
                  target="_blank" rel="noopener noreferrer"
@@ -973,7 +1064,7 @@
                      alt="QR Code LinkedIn Andrea Lombardo"
                      class="w-32 h-32 object-contain">
               </a>
-              <p class="text-xs text-steel-600 mt-3 font-mono">LinkedIn Profile</p>
+              <p class="text-xs text-slate-500 dark:text-steel-600 mt-3 font-mono">LinkedIn Profile</p>
             </div>
 
           </div>
@@ -992,9 +1083,9 @@
 
 
               <div class="mb-2">
-                <h3 class="text-lg font-bold text-steel-100 mb-1"
+                <h3 class="text-lg font-bold text-slate-900 dark:text-steel-100 mb-1"
                     data-it="Inviami un messaggio" data-en="Send me a message">Inviami un messaggio</h3>
-                <p class="text-steel-500 text-sm"
+                <p class="text-slate-500 dark:text-steel-500 text-sm"
                    data-it="Rispondo di solito entro 24–48 ore." data-en="I usually reply within 24–48 hours.">
                   Rispondo di solito entro 24–48 ore.
                 </p>
@@ -1002,42 +1093,43 @@
 
               <div class="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label for="contact-name" class="block text-sm font-medium text-steel-400 mb-1.5">
+                  <label for="contact-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     <span data-it="Nome" data-en="Name">Nome</span>
                     <span style="color:#2563EB;" aria-hidden="true"> *</span>
                   </label>
                   <input id="contact-name" type="text" name="name" required autocomplete="name"
                          data-placeholder-it="Il tuo nome" data-placeholder-en="Your name"
-                         placeholder="Il tuo nome" class="form-input">
+                         placeholder="Il tuo nome" class="form-input text-slate-900 dark:text-white bg-white/80 dark:bg-navy-900/50 border border-slate-300 dark:border-steel-700 placeholder-slate-400 dark:placeholder-slate-500">
                 </div>
                 <div>
-                  <label for="contact-email" class="block text-sm font-medium text-steel-400 mb-1.5">
+                  <label for="contact-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Email <span style="color:#2563EB;" aria-hidden="true">*</span>
                   </label>
                   <input id="contact-email" type="email" name="email" required autocomplete="email"
                          data-placeholder-it="la.tua@email.com" data-placeholder-en="your@email.com"
-                         placeholder="la.tua@email.com" class="form-input">
+                         placeholder="la.tua@email.com" class="form-input text-slate-900 dark:text-white bg-white/80 dark:bg-navy-900/50 border border-slate-300 dark:border-steel-700 placeholder-slate-400 dark:placeholder-slate-500">
                 </div>
               </div>
 
               <div>
-                <label for="contact-message" class="block text-sm font-medium text-steel-400 mb-1.5">
+                <label for="contact-message" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                   <span data-it="Messaggio" data-en="Message">Messaggio</span>
                   <span style="color:#2563EB;" aria-hidden="true"> *</span>
                 </label>
                 <textarea id="contact-message" name="message" required rows="5"
                           data-placeholder-it="Scrivi il tuo messaggio…" data-placeholder-en="Write your message…"
                           placeholder="Scrivi il tuo messaggio…"
-                          class="form-input resize-none"></textarea>
+                          class="form-input text-slate-900 dark:text-white bg-white/80 dark:bg-navy-900/50 border border-slate-300 dark:border-steel-700 placeholder-slate-400 dark:placeholder-steel-500 resize-none"></textarea>
               </div>
 
               <!-- Privacy checkbox — GDPR obbligatorio -->
               <div class="flex items-start gap-3">
                 <input id="privacy-consent" type="checkbox" name="privacy_consent" required
-                       class="mt-1 w-4 h-4 rounded border-steel-600 bg-navy-800
+                       class="mt-1 w-4 h-4 rounded border-slate-400 dark:border-steel-600
+                              bg-white dark:bg-navy-800
                               focus:ring-2 cursor-pointer"
                        style="accent-color: #2563EB;">
-                <label for="privacy-consent" class="text-sm text-steel-500 leading-relaxed cursor-pointer">
+                <label for="privacy-consent" class="text-sm text-slate-600 dark:text-steel-500 leading-relaxed cursor-pointer">
                   <span data-it="Acconsento al trattamento dei dati per la gestione di questa richiesta, come descritto nella"
                         data-en="I consent to the processing of my personal data to handle this request, as described in the">
                     Acconsento al trattamento dei dati per la gestione di questa richiesta, come descritto nella
@@ -1058,20 +1150,7 @@
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                 </svg>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-              </button>
-
-              <div id="form-success"
-                   class="hidden p-4 rounded-xl text-sm"
-                   style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.4); color: #93c5fd;"
-                   role="alert">
-                <p class="font-semibold" data-it="Messaggio inviato con successo!" data-en="Message sent successfully!">Messaggio inviato con successo!</p>
-                <p class="text-teal-400/80 mt-1"
-                   data-it="Grazie per avermi contattato. Ti risponderò presto."
-                   data-en="Thank you for reaching out. I'll get back to you soon.">
-                  Grazie per avermi contattato. Ti risponderò presto.
+                <svg class="w-5 h-5" fill="none" stroke="currentColor"                  Grazie per avermi contattato. Ti risponderò presto.
                 </p>
               </div>
               <div id="form-error"
@@ -1095,34 +1174,33 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="bg-navy-950 border-t border-steel-800/30 text-steel-500 py-10" role="contentinfo">
+  <footer class="bg-slate-200 dark:bg-[#071121] border-t border-slate-300 dark:border-blue-900/50 py-10 relative z-20 transition-colors duration-300" role="contentinfo">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
 
         <div>
-          <p class="text-steel-100 font-bold text-lg mb-1 font-mono">
-            <span style="color:#2563EB;">&lt;</span>AL<span style="color:#2563EB;">/&gt;</span>
+          <p class="text-slate-900 dark:text-white font-bold text-lg mb-1 font-mono">
+            <span class="text-blue-600">&lt;</span>AL<span class="text-blue-600">/&gt;</span>
           </p>
-          <p class="text-sm text-steel-600"
+          <p class="text-sm text-slate-600 dark:text-slate-400"
              data-it="&copy; 2026 Andrea Lombardo. Tutti i diritti riservati."
              data-en="&copy; 2026 Andrea Lombardo. All rights reserved.">
             &copy; 2026 Andrea Lombardo. Tutti i diritti riservati.
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-steel-600">
-          <a href="#" data-open-privacy class="transition-colors duration-300" style="color: inherit;">
+        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+          <a href="#" data-open-privacy class="hover:text-slate-900 dark:hover:text-white transition-colors duration-300">
             Privacy Policy
           </a>
-          <span class="text-steel-800" aria-hidden="true">·</span>
-          <a href="mailto:lomband02@gmail.com" class="transition-colors duration-300" style="color: inherit;"
-             onmouseover="this.style.color='#60a5fa'" onmouseout="this.style.color=''">
+          <span class="text-slate-400 dark:text-steel-800" aria-hidden="true">&bull;</span>
+          <a href="mailto:lomband02@gmail.com" class="hover:text-slate-900 dark:hover:text-white transition-colors duration-300">
             lomband02@gmail.com
           </a>
-          <span class="text-steel-800" aria-hidden="true">·</span>
+          <span class="text-slate-400 dark:text-steel-800" aria-hidden="true">&bull;</span>
           <a href="https://www.linkedin.com/in/andrea-lombardo-748461345"
              target="_blank" rel="noopener noreferrer"
-             class="transition-colors duration-300" style="color: inherit;"
+             class="hover:text-slate-900 dark:hover:text-white transition-colors duration-300"
              aria-label="LinkedIn">
             <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -1130,7 +1208,6 @@
             LinkedIn
           </a>
         </div>
-
       </div>
     </div>
   </footer>
@@ -1139,11 +1216,13 @@
   <div id="privacy-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
     <div class="modal-content">
       <div class="flex items-center justify-between mb-6">
-        <h2 id="privacy-modal-title" class="text-2xl font-bold text-steel-100">Privacy Policy</h2>
+        <h2 id="privacy-modal-title" class="text-2xl font-bold text-slate-900 dark:text-steel-100">Privacy Policy</h2>
         <button data-close-modal
-                class="w-10 h-10 rounded-full bg-steel-700/60 hover:bg-steel-600/80
-                       text-steel-400 hover:text-steel-200 flex items-center justify-center
-                       transition-colors duration-200"
+                class="w-10 h-10 rounded-full bg-slate-200 dark:bg-steel-700/60
+                       hover:bg-slate-300 dark:hover:bg-steel-600/80
+                       text-slate-500 dark:text-steel-400
+                       hover:text-slate-700 dark:hover:text-steel-200
+                       flex items-center justify-center transition-colors duration-200"
                 aria-label="Chiudi">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -1151,10 +1230,10 @@
         </button>
       </div>
 
-      <div class="text-steel-400 space-y-4 text-sm leading-relaxed">
+      <div class="text-slate-600 dark:text-steel-400 space-y-4 text-sm leading-relaxed">
 
-        <p><strong class="text-steel-200">Titolare del trattamento:</strong> Andrea Lombardo — Airasca (TO), Italia<br>
-        <strong class="text-steel-200">Email:</strong> lomband02@gmail.com</p>
+        <p><strong class="text-slate-800 dark:text-steel-200">Titolare del trattamento:</strong> Andrea Lombardo — Airasca (TO), Italia<br>
+        <strong class="text-slate-800 dark:text-steel-200">Email:</strong> lomband02@gmail.com</p>
 
         <h3 class="text-base font-bold text-steel-200 mt-5">1. Dati raccolti</h3>
         <p>Attraverso il modulo di contatto raccogliamo esclusivamente: <strong class="text-steel-300">Nome, Indirizzo email e Messaggio</strong>.<br>

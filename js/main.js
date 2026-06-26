@@ -72,6 +72,7 @@ function applyLang(lang) {
    BOOT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function () {
+  initThemeToggle();          /* STEP 4: Must run first so icons are correct */
   initNetworkCanvas();
   initNavigation();
   initScrollReveal();
@@ -79,10 +80,51 @@ document.addEventListener('DOMContentLoaded', function () {
   initPrivacyModal();
   initMobileMenu();
   initLangDropdown();
-  initSkillCardTilt();
+  initSkillCardTilt();       /* FIX #5: desktop only */
   initProfilePhoto();
   initTypewriter();
+  initHardSkillsCarousel();  /* FIX #4: mobile autoplay */
+  initCursorGlow();          /* UPGRADE #8: micro-animazioni */
 });
+
+/* ============================================================
+   THEME TOGGLE — STEP 4
+   Manual light/dark toggle. Persists choice to localStorage.
+   Icon: Sun shown when dark (click → light). Moon when light (click → dark).
+   ============================================================ */
+function initThemeToggle() {
+  var btn      = document.getElementById('theme-toggle');
+  var iconSun  = document.getElementById('theme-icon-sun');
+  var iconMoon = document.getElementById('theme-icon-moon');
+  if (!btn) return;
+
+  /* Sync icon to current state (already set by anti-flash script) */
+  function syncIcon() {
+    var isDark = document.documentElement.classList.contains('dark');
+    if (iconSun)  iconSun.classList.toggle('hidden', !isDark);  /* Sun visible in dark mode */
+    if (iconMoon) iconMoon.classList.toggle('hidden', isDark);  /* Moon visible in light mode */
+    btn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+  }
+
+  function setTheme(dark) {
+    if (dark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+    syncIcon();
+    /* Tell the canvas to redraw with new palette immediately */
+    window.dispatchEvent(new CustomEvent('themechange'));
+  }
+
+  btn.addEventListener('click', function () {
+    setTheme(!document.documentElement.classList.contains('dark'));
+  });
+
+  syncIcon();
+}
 
 /* ============================================================
    LANGUAGE DROPDOWN
@@ -134,11 +176,16 @@ function initLangDropdown() {
 
 /* ============================================================
    PROFILE PHOTO — graceful fallback if image fails
+   FIX #3: will-change + smooth scale via CSS (see input.css)
    ============================================================ */
 function initProfilePhoto() {
   var img       = document.getElementById('profile-img');
-  var container = document.getElementById('profile-frame'); /* ora è .profile-photo-wrap */
+  var container = document.getElementById('profile-frame');
   if (!img || !container) return;
+
+  /* Apply will-change to prevent rendering artefacts on hover */
+  container.style.willChange = 'transform';
+  img.style.willChange       = 'transform';
 
   img.addEventListener('error', function () {
     img.style.display = 'none';
@@ -170,28 +217,37 @@ function initNetworkCanvas() {
   var NODE_SPEED     = 0.28;
   var BAND_WIDTH     = 0.15; /* 15% dello schermo per banda */
 
-  /* Palette Blu di Prussia */
-  var COLORS = [
+  /* ---- Theme-aware palettes ---- */
+  /* Dark: vivid blues on dark bg. Light: deep navy/indigo visible on white. */
+  var COLORS_DARK = [
     'rgba(37,99,235,',    /* blue-600 */
     'rgba(59,130,246,',   /* blue-500 */
     'rgba(96,165,250,',   /* blue-400 */
     'rgba(147,197,253,',  /* blue-300 */
     'rgba(30,58,138,',    /* blue-900 */
+    'rgba(56,189,248,'    /* sky-400 */
   ];
+  var COLORS_LIGHT = [
+    'rgba(29,78,216,',    /* blue-700 — more visible on white */
+    'rgba(37,99,235,',    /* blue-600 */
+    'rgba(67,56,202,',    /* indigo-700 */
+    'rgba(55,48,163,',    /* indigo-800 */
+    'rgba(30,58,138,',    /* blue-900 */
+  ];
+
+  function getColors() {
+    return document.documentElement.classList.contains('dark') ? COLORS_DARK : COLORS_LIGHT;
+  }
 
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
   }
 
-  /**
-   * Crea i nodi e li confina nelle bande laterali.
-   * band = 'left'  → x ∈ [0,  W * BAND_WIDTH]
-   * band = 'right' → x ∈ [W * (1 - BAND_WIDTH),  W]
-   */
   function createNodes() {
     nodes = [];
     var bandW = W * BAND_WIDTH;
+    var COLORS = getColors();
 
     for (var i = 0; i < NODES_PER_BAND * 2; i++) {
       var isLeft = (i < NODES_PER_BAND);
@@ -228,19 +284,21 @@ function initNetworkCanvas() {
     var bandW = W * BAND_WIDTH;
 
     /* Gradient fade-in ai bordi della banda (verso il centro) */
-    /* Banda sinistra: fade da x=0 a x=bandW */
+    var isDark = document.documentElement.classList.contains('dark');
+    var maxOpacity = isDark ? 0.15 : 0.06;
+    var minOpacity = isDark ? 0.05 : 0.02;
+
     var fadeL = ctx.createLinearGradient(0, 0, bandW, 0);
-    fadeL.addColorStop(0,   'rgba(37,99,235,0.06)');
-    fadeL.addColorStop(0.6, 'rgba(37,99,235,0.02)');
+    fadeL.addColorStop(0,   'rgba(37,99,235,' + maxOpacity + ')');
+    fadeL.addColorStop(0.6, 'rgba(37,99,235,' + minOpacity + ')');
     fadeL.addColorStop(1,   'rgba(0,0,0,0)');
     ctx.fillStyle = fadeL;
     ctx.fillRect(0, 0, bandW, H);
 
-    /* Banda destra */
     var fadeR = ctx.createLinearGradient(W - bandW, 0, W, 0);
     fadeR.addColorStop(0,   'rgba(0,0,0,0)');
-    fadeR.addColorStop(0.4, 'rgba(37,99,235,0.02)');
-    fadeR.addColorStop(1,   'rgba(37,99,235,0.06)');
+    fadeR.addColorStop(0.4, 'rgba(37,99,235,' + minOpacity + ')');
+    fadeR.addColorStop(1,   'rgba(37,99,235,' + maxOpacity + ')');
     ctx.fillStyle = fadeR;
     ctx.fillRect(W - bandW, 0, bandW, H);
 
@@ -262,7 +320,7 @@ function initNetworkCanvas() {
       if (n.x < n.xMin) { n.x = n.xMin; n.vx = Math.abs(n.vx); }
       if (n.x > n.xMax) { n.x = n.xMax; n.vx = -Math.abs(n.vx); }
 
-      /* Repulsione mouse (solo se il mouse è nella stessa banda) */
+      /* Repulsione mouse */
       var md = dist(n, mouse);
       if (md < MOUSE_DIST && md > 0) {
         var force = (MOUSE_DIST - md) / MOUSE_DIST;
@@ -277,14 +335,14 @@ function initNetworkCanvas() {
         n.vy = (n.vy / speed) * NODE_SPEED * 2.8;
       }
 
-      /* Opacità proporzionale alla distanza dal bordo verso il centro */
-      /* (il nodo sfuma avvicinandosi al centro della banda) */
       var relPos   = n.isLeft
-        ? (n.x / bandW)                 /* 0=bordo, 1=centro banda */
+        ? (n.x / bandW)
         : ((n.x - (W - bandW)) / bandW);
-      var edgeFade = 1 - Math.max(0, relPos - 0.3) / 0.7; /* sfuma nell'ultimo 70% della banda */
+      var edgeFade = 1 - Math.max(0, relPos - 0.3) / 0.7;
 
-      var baseAlpha = (0.55 + 0.2 * Math.sin(n.pulse)) * edgeFade;
+      var baseOpacity = isDark ? 0.95 : 0.55;
+      var pulseDelta = isDark ? 0.5 : 0.2;
+      var baseAlpha = (baseOpacity + pulseDelta * Math.sin(n.pulse)) * edgeFade;
 
       /* Glow radiale */
       var gr = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 5);
@@ -305,17 +363,20 @@ function initNetworkCanvas() {
     /* Connessioni — SOLO tra nodi della stessa banda */
     for (var i = 0; i < nodes.length; i++) {
       for (var j = i + 1; j < nodes.length; j++) {
-        if (nodes[i].isLeft !== nodes[j].isLeft) continue; /* bande diverse: skip */
+        if (nodes[i].isLeft !== nodes[j].isLeft) continue;
         var d = dist(nodes[i], nodes[j]);
         if (d < CONNECT_DIST) {
-          var alpha = (1 - d / CONNECT_DIST) * 0.28;
+          var isDark = document.documentElement.classList.contains('dark');
+          var lineAlpha = (1 - d / CONNECT_DIST) * (isDark ? 0.28 : 0.22);
           ctx.save();
           ctx.setLineDash([3, 7]);
           ctx.lineDashOffset = -(Date.now() / 100) % 10;
           ctx.beginPath();
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.strokeStyle = 'rgba(37,99,235,' + alpha + ')';
+          ctx.strokeStyle = isDark
+            ? 'rgba(37,99,235,' + lineAlpha + ')'
+            : 'rgba(29,78,216,' + lineAlpha + ')';
           ctx.lineWidth = 0.7;
           ctx.stroke();
           ctx.restore();
@@ -330,6 +391,16 @@ function initNetworkCanvas() {
     resize();
     createNodes();
   }, { passive: true });
+
+  /* Rebuild node colors when theme toggles */
+  window.addEventListener('themechange', function () {
+    var COLORS = getColors();
+    if (nodes) {
+      nodes.forEach(function (n) {
+        n.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      });
+    }
+  });
 
   window.addEventListener('mousemove', function (e) {
     mouse.x = e.clientX;
@@ -428,7 +499,6 @@ function initContactForm() {
     /* ── GUARDRAIL PRIVACY: blocco JS invalicabile ── */
     var privacyBox = document.getElementById('privacy-consent');
     if (!privacyBox || !privacyBox.checked) {
-      /* Mostra il validation bubble nativo del browser sulla checkbox */
       if (form.reportValidity) form.reportValidity();
       return;
     }
@@ -449,19 +519,16 @@ function initContactForm() {
     if (submitBtn) submitBtn.disabled = true;
 
     var formData = new FormData(form);
-    /* Previene il blocco "Pro feature" rimuovendo la retrocompatibilità di hCaptcha */
     formData.delete('g-recaptcha-response');
 
-    fetch('https://api.web3forms.com/submit', { 
-      method: 'POST', 
-      headers: {
-        'Accept': 'application/json'
-      },
-      body: formData 
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
     })
-      .then(function (r) { 
+      .then(function (r) {
         console.log("Risposta server:", r);
-        return r.json(); 
+        return r.json();
       })
       .then(function (result) {
         console.log("Dati Web3Forms:", result);
@@ -551,19 +618,210 @@ function closeMobileMenu() {
 
 /* ============================================================
    SKILL CARD TILT (3D perspective on hover)
+   FIX #5: Disabled on touch/mobile devices — desktop only
    ============================================================ */
 function initSkillCardTilt() {
+  /* Detect touch: if device is primarily touch-based, skip tilt entirely */
+  var isTouchDevice = (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.msMaxTouchPoints > 0
+  );
+  if (isTouchDevice) return; /* No tilt on mobile / touch */
+
+  /* Also respect window width — skip below 768px just in case */
+  if (window.innerWidth < 768) return;
+
   document.querySelectorAll('.skill-card').forEach(function (card) {
     card.addEventListener('mousemove', function (e) {
       var rect = card.getBoundingClientRect();
       var dx   = (e.clientX - rect.left  - rect.width  / 2) / (rect.width  / 2);
       var dy   = (e.clientY - rect.top   - rect.height / 2) / (rect.height / 2);
-      card.style.transform  = 'translateY(-8px) rotateX(' + (-dy * 5) + 'deg) rotateY(' + (dx * 5) + 'deg)';
+      /* Clamp to avoid extreme angles */
+      dx = Math.max(-1, Math.min(1, dx));
+      dy = Math.max(-1, Math.min(1, dy));
+      card.style.transform  = 'perspective(1000px) translateY(-8px) rotateX(' + (-dy * 5) + 'deg) rotateY(' + (dx * 5) + 'deg)';
       card.style.transition = 'transform 0.1s ease';
     });
     card.addEventListener('mouseleave', function () {
       card.style.transform  = '';
       card.style.transition = 'transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease, border-color 0.5s ease';
+    });
+  });
+}
+
+/* ============================================================
+   HARD SKILLS CAROUSEL — Mobile autoplay (< 768px)
+   FIX #4: Converts grid to horizontal slider on mobile only.
+           Pauses on touch/interaction. Grid intact on desktop.
+   ============================================================ */
+function initHardSkillsCarousel() {
+  /* Only activate below 768px */
+  if (window.innerWidth >= 768) return;
+
+  var skillsGrid = document.getElementById('skills-grid');
+  if (!skillsGrid) return;
+
+  var cards = Array.prototype.slice.call(skillsGrid.querySelectorAll('.skill-card'));
+  if (cards.length === 0) return;
+
+  /* Build carousel DOM */
+  var wrapper = document.createElement('div');
+  wrapper.className = 'skills-carousel-wrapper';
+  wrapper.setAttribute('aria-label', 'Skills carousel');
+
+  var track = document.createElement('div');
+  track.className = 'skills-carousel-track';
+  track.id = 'skills-carousel-track';
+
+  /* Move cards into the track */
+  cards.forEach(function (card) {
+    card.classList.remove('reveal'); /* avoid reveal animation fighting carousel */
+    card.classList.add('revealed');
+    track.appendChild(card);
+  });
+
+  wrapper.appendChild(track);
+
+  /* Replace grid with carousel wrapper */
+  skillsGrid.parentNode.insertBefore(wrapper, skillsGrid);
+  skillsGrid.style.display = 'none';
+
+  /* Dots indicator */
+  var dots = document.createElement('div');
+  dots.style.cssText = 'display:flex; justify-content:center; gap:6px; margin-top:16px;';
+  cards.forEach(function (_, i) {
+    var dot = document.createElement('button');
+    dot.style.cssText = 'width:6px; height:6px; border-radius:50%; border:none; cursor:pointer; transition: all 0.3s; background:' + (i === 0 ? '#2563EB' : 'rgba(148,163,184,0.4)') + '; padding:0;';
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.addEventListener('click', function () {
+      goTo(i);
+      pauseAutoplay();
+    });
+    dots.appendChild(dot);
+  });
+  wrapper.after(dots);
+
+  var currentIdx   = 0;
+  var totalCards   = cards.length;
+  var autoplayTimer = null;
+  var isPaused     = false;
+
+  function goTo(idx) {
+    currentIdx = ((idx % totalCards) + totalCards) % totalCards;
+    var cardWidth = cards[0].offsetWidth + 20; /* 20 = gap (1.25rem) */
+    track.style.transform = 'translateX(-' + (currentIdx * cardWidth) + 'px)';
+
+    /* Update dots */
+    var allDots = dots.querySelectorAll('button');
+    allDots.forEach(function (dot, i) {
+      dot.style.background = i === currentIdx ? '#2563EB' : 'rgba(148,163,184,0.4)';
+      dot.style.transform  = i === currentIdx ? 'scale(1.4)' : 'scale(1)';
+    });
+  }
+
+  function next() {
+    goTo(currentIdx + 1);
+  }
+
+  function startAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+    autoplayTimer = setInterval(function () {
+      if (!isPaused) next();
+    }, 3200);
+  }
+
+  function pauseAutoplay() {
+    isPaused = true;
+    clearTimeout(pauseAutoplay._resumeTimer);
+    pauseAutoplay._resumeTimer = setTimeout(function () {
+      isPaused = false;
+    }, 6000); /* Resume after 6s of inactivity */
+  }
+
+  /* Touch: pause on touchstart, resume on touchend */
+  wrapper.addEventListener('touchstart', function () {
+    pauseAutoplay();
+  }, { passive: true });
+
+  /* Touch swipe */
+  var touchStartX = 0;
+  wrapper.addEventListener('touchstart', function (e) {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  wrapper.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) {
+      if (dx < 0) goTo(currentIdx + 1);
+      else        goTo(currentIdx - 1);
+    }
+  }, { passive: true });
+
+  goTo(0);
+  startAutoplay();
+
+  /* Re-init on resize: if user rotates to landscape */
+  window.addEventListener('resize', function () {
+    if (window.innerWidth >= 768) {
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      /* Show grid again, hide carousel */
+      skillsGrid.style.display = '';
+      wrapper.style.display    = 'none';
+      dots.style.display       = 'none';
+    } else {
+      skillsGrid.style.display = 'none';
+      wrapper.style.display    = '';
+      dots.style.display       = 'flex';
+      goTo(currentIdx); /* recalc offset */
+    }
+  }, { passive: true });
+}
+
+/* ============================================================
+   CURSOR GLOW — Premium micro-animation UPGRADE #8
+   Tracks mouse and projects a soft radial glow on interactive
+   sections. Desktop only.
+   ============================================================ */
+function initCursorGlow() {
+  var isTouchDevice = (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  );
+  if (isTouchDevice) return;
+
+  /* Apply glow to skill-cards and glass-cards on hover */
+  var glowCards = document.querySelectorAll('.glass-card, .skill-card');
+  glowCards.forEach(function (card) {
+    var glow = null;
+
+    card.addEventListener('mouseenter', function () {
+      card.style.position = card.style.position || 'relative';
+      glow = document.createElement('div');
+      glow.className = 'cursor-glow';
+      glow.style.opacity = '0';
+      card.appendChild(glow);
+      /* Fade in */
+      requestAnimationFrame(function () {
+        glow.style.transition = 'opacity 0.3s';
+        glow.style.opacity    = '1';
+      });
+    });
+
+    card.addEventListener('mousemove', function (e) {
+      if (!glow) return;
+      var rect = card.getBoundingClientRect();
+      var x    = e.clientX - rect.left;
+      var y    = e.clientY - rect.top;
+      glow.style.left = x + 'px';
+      glow.style.top  = y + 'px';
+    });
+
+    card.addEventListener('mouseleave', function () {
+      if (!glow) return;
+      glow.style.opacity = '0';
+      var g = glow;
+      setTimeout(function () { if (g && g.parentNode) g.parentNode.removeChild(g); }, 350);
+      glow = null;
     });
   });
 }

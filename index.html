@@ -26,12 +26,12 @@
   -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+                 script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://js.hcaptcha.com https://*.hcaptcha.com;
                  style-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com;
                  img-src 'self' data: https://hcaptcha.com https://*.hcaptcha.com;
                  font-src 'self';
                  connect-src 'self' https://api.web3forms.com https://hcaptcha.com https://*.hcaptcha.com;
-                 form-action https://api.web3forms.com;
+                 form-action 'self' https://api.web3forms.com;
                  frame-src 'self' https://hcaptcha.com https://*.hcaptcha.com;
                  object-src 'none';
                  base-uri 'self';">
@@ -70,9 +70,9 @@
   <!-- ═══════════════════════════════════════════════════════════════
        GSAP + ScrollTrigger — Animation Engine (CDN)
        ═══════════════════════════════════════════════════════════════ -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollToPlugin.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js" integrity="sha384-pEQB1h4Zmn9xhS6jotzltHSIQq6N0Oh3BXkCNOH5LKI81R2NRbb9efarAJYw9gTY" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js" integrity="sha384-TgZ1GoXcDnrw/czNfaiSZSFV1zgIRv8aQOevBA8ppS4SkNONmzYfjARpXsDfdnUE" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollToPlugin.min.js" integrity="sha384-YY6eh3HcwX3eP3uj3yhZIjt5UBePPmXrYcxT0y0232SA5OGaun9Ivi45Dbm+Z/CQ" crossorigin="anonymous" defer></script>
 
   <!-- hCaptcha — form spam protection -->
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
